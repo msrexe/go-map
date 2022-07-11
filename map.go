@@ -4,24 +4,35 @@ import (
 	"sync"
 )
 
+type GoMap[K comparable, V any] interface {
+	Get(key K) V
+	Set(key K, val V)
+	Delete(key K)
+	Length() int
+	Keys() []K
+	Values() []V
+	Clear()
+	IsExists(key K) bool
+}
+
 type Map[K comparable, V any] map[K]V
 
-type GoMap[K comparable, V any] struct {
+type goMap[K comparable, V any] struct {
 	mu sync.Mutex
 
 	goMap Map[K, V]
 }
 
 // Creates a new GoMap instance
-func New[K comparable, V any](size int) *GoMap[K, V] {
-	return &GoMap[K, V]{
+func New[K comparable, V any](size int) GoMap[K, V] {
+	return &goMap[K, V]{
 		mu:    sync.Mutex{},
 		goMap: Map[K, V](make(map[K]V, size)),
 	}
 }
 
 // Get a value from the map
-func (gm *GoMap[K, V]) Get(key K) V {
+func (gm *goMap[K, V]) Get(key K) V {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -29,7 +40,7 @@ func (gm *GoMap[K, V]) Get(key K) V {
 }
 
 // Set a key-value in the map
-func (gm *GoMap[K, V]) Set(key K, val V) {
+func (gm *goMap[K, V]) Set(key K, val V) {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -37,7 +48,7 @@ func (gm *GoMap[K, V]) Set(key K, val V) {
 }
 
 // Delete a key-value from the map
-func (gm *GoMap[K, V]) Delete(key K) {
+func (gm *goMap[K, V]) Delete(key K) {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -45,7 +56,7 @@ func (gm *GoMap[K, V]) Delete(key K) {
 }
 
 // Get size of the map
-func (gm *GoMap[K, V]) Length() int {
+func (gm *goMap[K, V]) Length() int {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -53,7 +64,7 @@ func (gm *GoMap[K, V]) Length() int {
 }
 
 // Get all keys from the map
-func (gm *GoMap[K, V]) Keys() []K {
+func (gm *goMap[K, V]) Keys() []K {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -67,7 +78,7 @@ func (gm *GoMap[K, V]) Keys() []K {
 }
 
 // Get all values from the map
-func (gm *GoMap[K, V]) Values() []V {
+func (gm *goMap[K, V]) Values() []V {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -81,7 +92,7 @@ func (gm *GoMap[K, V]) Values() []V {
 }
 
 // Clear the map
-func (gm *GoMap[K, V]) Clear() {
+func (gm *goMap[K, V]) Clear() {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
@@ -89,7 +100,7 @@ func (gm *GoMap[K, V]) Clear() {
 }
 
 // Check key exists in the map
-func (gm *GoMap[K, V]) IsExists(key K) bool {
+func (gm *goMap[K, V]) IsExists(key K) bool {
 	gm.mu.Lock()
 	defer gm.mu.Unlock()
 
